@@ -31,13 +31,13 @@ Amb `systemctl status kea-dhcp4-server` es veu que el servei DHCP de Kea està *
 
 ### 1.2 Xarxa del servidor a VirtualBox
 
-![Adaptador 2 del servidor](images/02-servidor-adaptador-red.png)
+![Adaptador 2 del servidor](02-servidor-adaptador-red.png)
 
 El servidor té un segon adaptador de xarxa connectat a una **xarxa interna** anomenada `redDHCP`. És la xarxa per la qual repartirà les IP als clients.
 
 ### 1.3 Paquets instal·lats i servei IPv6 desactivat
 
-![Paquets de Kea i desactivar dhcp6](images/03-servidor-paquetes-kea.png)
+![Paquets de Kea i desactivar dhcp6](03-servidor-paquetes-kea.png)
 
 Amb `dpkg -l | grep kea` es comprova quines parts de Kea estan instal·lades. Després es desactiva `kea-dhcp6-server` amb `systemctl disable`, perquè aquesta pràctica només fa servir IPv4 i no cal el servei per a IPv6.
 
@@ -45,19 +45,19 @@ Amb `dpkg -l | grep kea` es comprova quines parts de Kea estan instal·lades. De
 
 ### 2.1 Arrencar i activar el servei
 
-![Enable --now i status](images/04-servidor-arrancar-servicio.png)
+![Enable --now i status](04-servidor-arrancar-servicio.png)
 
 `systemctl enable --now kea-dhcp4-server` fa dues coses: **arrenca** el servei ara i el deixa **activat** perquè s’iniciï sol cada vegada que s’encengui el servidor. Amb `status` es confirma que està en marxa.
 
 ### 2.2 Aturar el servei
 
-![Stop i status](images/05-servidor-parar-servicio.png)
+![Stop i status](05-servidor-parar-servicio.png)
 
 Amb `systemctl stop` s’atura el servei i `status` mostra **inactive (dead)**. Mentre està aturat, cap client nou podria rebre IP.
 
 ## 3. Veure com es reparteix una IP (DORA)
 
-![Captura de trànsit DHCP](images/06-captura-dora.png)
+![Captura de trànsit DHCP](06-captura-dora.png)
 
 Aquesta captura (feta amb `tcpdump`) mostra la conversa entre client i servidor. Es diu **DORA** per les quatre lletres dels missatges: *Discover*, *Offer*, *Request* i *Acknowledge*. A la imatge es veuen els tres últims:
 
@@ -71,25 +71,25 @@ La resposta inclou la configuració que rep el client: màscara `255.255.255.0`,
 
 ### 4.1 Demanar una IP nova
 
-![nmcli disconnect i connect](images/07-cliente-ubuntu-renovar.png)
+![nmcli disconnect i connect](07-cliente-ubuntu-renovar.png)
 
 Per forçar que el client demani IP, es desconnecta i es torna a connectar la targeta de xarxa amb `nmcli device disconnect` i `nmcli device connect`. (El primer intent falla perquè es va escriure `conect` en lloc de `connect`.)
 
 ### 4.2 IP rebuda
 
-![ip a show](images/08-cliente-ubuntu-ip.png)
+![ip a show](08-cliente-ubuntu-ip.png)
 
 Amb `ip a show enp0s3` es veu que el client ha rebut la IP **192.168.10.50/24**. La paraula `dynamic` indica que li l’ha donada el servidor DHCP.
 
 ### 4.3 Porta d’enllaç i DNS
 
-![ip route i resolvectl](images/09-cliente-ubuntu-ruta-dns.png)
+![ip route i resolvectl](09-cliente-ubuntu-ruta-dns.png)
 
 `ip route` mostra que la porta d’enllaç és `192.168.10.1`, apresa per DHCP. `resolvectl status` mostra els DNS `1.1.1.1` i `8.8.8.8` i el domini `oficina.local`. Tot coincideix amb el que va repartir el servidor.
 
 ### 4.4 Registre al servidor
 
-![Fitxer de concessions](images/10-servidor-concesiones-ubuntu.png)
+![Fitxer de concessions](10-servidor-concesiones-ubuntu.png)
 
 Al servidor, el fitxer `/var/lib/kea/kea-leases4.csv` guarda les IP repartides. Hi apareix la `192.168.10.50` associada a la MAC del client i al seu nom d’equip (`guille-virtualbox`).
 
@@ -97,19 +97,19 @@ Al servidor, el fitxer `/var/lib/kea/kea-leases4.csv` guarda les IP repartides. 
 
 ### 5.1 Xarxa del client a VirtualBox
 
-![Adaptador del client xarxa](images/11-cliente-reserva-adaptador.png)
+![Adaptador del client xarxa](11-cliente-reserva-adaptador.png)
 
 Aquest client també és a la xarxa interna `redDHCP`, però amb una MAC fixada a mà: `AABBCC112233`. Es fa així perquè el servidor la reconegui i li doni sempre la mateixa IP.
 
 ### 5.2 IP rebuda
 
-![Terminal del client amb IP reservada](images/12-cliente-reserva-terminal.png)
+![Terminal del client amb IP reservada](12-cliente-reserva-terminal.png)
 
 Després de desconnectar i connectar la xarxa, el client rep la IP **192.168.10.20**. És diferent de les del rang automàtic, perquè és una **reserva**: el servidor la guarda per a aquesta MAC.
 
 ### 5.3 Registre al servidor
 
-![Concessions amb la reserva](images/13-servidor-concesiones-reserva.png)
+![Concessions amb la reserva](13-servidor-concesiones-reserva.png)
 
 Ara el fitxer de concessions té dues files: la de l’Ubuntu (`192.168.10.50`) i la nova, `192.168.10.20`, amb la MAC `aa:bb:cc:11:22:33` i el nom `impresora-dir`.
 
@@ -117,19 +117,19 @@ Ara el fitxer de concessions té dues files: la de l’Ubuntu (`192.168.10.50`) 
 
 ### 6.1 Xarxa del Windows a VirtualBox
 
-![Adaptador de mvw](images/14-windows-adaptador.png)
+![Adaptador de mvw](14-windows-adaptador.png)
 
 La màquina Windows (`mvw`) també està connectada a la xarxa interna `redDHCP`.
 
 ### 6.2 Alliberar i renovar la IP
 
-![ipconfig release i renew](images/15-windows-release-renew.png)
+![ipconfig release i renew](15-windows-release-renew.png)
 
 `ipconfig /release` retorna la IP al servidor i l’equip es queda sense adreça. Amb `ipconfig /renew` en demana una de nova i rep **192.168.10.51**, amb màscara `255.255.255.0`, porta d’enllaç `192.168.10.1` i domini `oficina.local`.
 
 ### 6.3 Dades completes de la IP
 
-![ipconfig all](images/16-windows-ipconfig-all.png)
+![ipconfig all](16-windows-ipconfig-all.png)
 
 `ipconfig /all` confirma que el DHCP està habilitat i que el servidor que ha donat la IP és `192.168.10.1`. També mostra els DNS (`1.1.1.1` i `8.8.8.8`) i quan s’ha obtingut i quan caduca la concessió (unes 2 hores).
 
@@ -137,7 +137,7 @@ La màquina Windows (`mvw`) també està connectada a la xarxa interna `redDHCP`
 
 ## Mapa conceptual
 
-![Mapa conceptual del servei DHCP amb Kea](images/17-mapa-conceptual.png)
+![Mapa conceptual del servei DHCP amb Kea](17-mapa-conceptual.png)
 
 El mapa resumeix el servei DHCP de Kea en cinc blocs:
 
