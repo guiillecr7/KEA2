@@ -2,7 +2,7 @@
 
 Guia amb captures de com muntar un servidor DHCP amb **Kea** a Ubuntu i comprovar que funciona amb tres clients: un Ubuntu, un equip amb IP reservada i un Windows.
 
-*(Versió en castellà: [README.es.md](README.es.md))*
+
 
 ## Què és DHCP?
 
@@ -25,7 +25,7 @@ Totes les màquines són a la mateixa xarxa interna de VirtualBox, anomenada `re
 
 ### 1.1 Estat de Kea en arrencar
 
-![Estat de kea-dhcp4-server](images/01-servidor-kea-estado.png)
+![Estat de kea-dhcp4-server](01-servidor-kea-estado.png)
 
 Amb `systemctl status kea-dhcp4-server` es veu que el servei DHCP de Kea està **actiu (running)**. Als missatges del final es llegeix que Kea ha carregat la configuració i s’ha iniciat correctament.
 
